@@ -31,8 +31,27 @@ import {
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cookies } from 'next/headers'
+import { accountApiRequest } from '@/apiRequests/account'
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const cookieStore= cookies()
+  const accessToken = cookieStore.get('accessToken')?.value!
+  let name= ''
+  try {
+    const result = await accountApiRequest.sMe(accessToken)
+    name= result.payload.data.name
+  } catch (
+    error:any
+  ) {
+  
+    if(error.digest?.includes('NEXT_REDIRECT')){
+      throw error
+    } 
+  }
+ 
+
+
   return (
     <main className='grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8'>
       <Tabs defaultValue='all'>

@@ -1,6 +1,7 @@
 import envConfig from '@/config'
 import { normalizePath } from '@/lib/utils'
 import { LoginResType } from '@/schemaValidations/auth.schema'
+import { log } from 'console'
 import { redirect } from 'next/navigation'
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
@@ -141,6 +142,7 @@ const request = async <Response>(
             localStorage.removeItem('refreshToken')
         }
     }
+    
     return data
 }
 

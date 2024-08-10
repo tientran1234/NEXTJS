@@ -4,7 +4,10 @@ import{
     QueryClientProvider,
   } from '@tanstack/react-query'
   import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import React from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import RefreshToken from './refresh-token'
+import { getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
+import { boolean } from 'zod'
 const queryClient = new QueryClient({
     defaultOptions:{
         queries:{
@@ -13,13 +16,41 @@ const queryClient = new QueryClient({
         }
     }
 })
+const AppContext = createContext<{
+    isAuth: boolean
+    setIsAuth: (value: boolean) => void
+  }>({
+    isAuth: false,
+    setIsAuth: (value: boolean) => {}
+  })
+export const useAppContext=()=>{
+    return useContext(AppContext)
+}
 export default  function AppProvider({children}:{
     children:React.ReactNode
 }){
+    const [isAuth,setIsAuthState] = useState(false)
+    useEffect(()=>{
+        const accessToken = getAccessTokenFromLocalStorage()
+        if(accessToken){
+            setIsAuthState(true)
+        }
+    },[])
+    const setIsAuth=useCallback((isAuth:boolean)=>{
+        if(isAuth){
+            setIsAuthState(true)
+        }else{
+            setIsAuthState(false)
+            removeTokensFromLocalStorage()
+        }
+    },[])
     return (
+        <AppContext.Provider value= {{isAuth,setIsAuth}}>
         <QueryClientProvider client={queryClient}>
        {children}
+       <RefreshToken/>
        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
+      </AppContext.Provider>
     )
 }
