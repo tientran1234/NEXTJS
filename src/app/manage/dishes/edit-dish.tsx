@@ -90,7 +90,7 @@ if(data){
         toast({
           description:result.payload.message
         })
-        // refetch()
+        refetch()
         onSubmitSuccess && onSubmitSuccess()
      
     }catch(error){
@@ -117,7 +117,7 @@ if(data){
         }}>
         <DialogHeader>
           <DialogTitle>Cập nhật món ăn</DialogTitle>
-          <DialogDescription>Các trường sau đây là bắ buộc: Tên, ảnh</DialogDescription>
+          <DialogDescription>Các trường sau đây là bắt buộc: Tên, ảnh</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-dish-form'   onSubmit={form.handleSubmit(onSubmit, (e, v) => {
@@ -213,7 +213,7 @@ if(data){
                     <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
                       <Label htmlFor='description'>Trạng thái</Label>
                       <div className='col-span-3 w-full space-y-2'>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder='Chọn trạng thái' />
