@@ -6,8 +6,10 @@ import{
   import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import RefreshToken from './refresh-token'
-import { getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
+import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
 import { boolean } from 'zod'
+import { RoleType } from '@/types/jwt.types'
+import { decode } from 'jsonwebtoken'
 const queryClient = new QueryClient({
     defaultOptions:{
         queries:{
@@ -16,36 +18,33 @@ const queryClient = new QueryClient({
         }
     }
 })
-const AppContext = createContext<{
-    isAuth: boolean
-    setIsAuth: (value: boolean) => void
-  }>({
-    isAuth: false,
-    setIsAuth: (value: boolean) => {}
-  })
+const AppContext = createContext({
+    isAuth:false,
+    role: undefined as RoleType | undefined,
+    setRole: (role?: RoleType | undefined) => {}
+})
 export const useAppContext=()=>{
     return useContext(AppContext)
 }
 export default  function AppProvider({children}:{
     children:React.ReactNode
 }){
-    const [isAuth,setIsAuthState] = useState(false)
+    const [role,setRoleState] = useState<RoleType | undefined>()
     useEffect(()=>{
         const accessToken = getAccessTokenFromLocalStorage()
         if(accessToken){
-            setIsAuthState(true)
+            const {role} = decodeToken(accessToken)
+            setRoleState(role)
         }
     },[])
-    const setIsAuth=useCallback((isAuth:boolean)=>{
-        if(isAuth){
-            setIsAuthState(true)
-        }else{
-            setIsAuthState(false)
-            removeTokensFromLocalStorage()
-        }
+    const setRole = useCallback((role?:RoleType | undefined)=>{
+            setRoleState(role)
+            if(!role) removeTokensFromLocalStorage()
+
     },[])
+    const isAuth = Boolean(role)
     return (
-        <AppContext.Provider value= {{isAuth,setIsAuth}}>
+        <AppContext.Provider value= {{isAuth,role,setRole}}>
         <QueryClientProvider client={queryClient}>
        {children}
        <RefreshToken/>

@@ -21,11 +21,12 @@ const authApiRequest = {
 
     )=> http.post<RefreshTokenResType>('/auth/refresh-token',body),
     async refreshToken(){
-        if(this.refreshTokenRequest){
-            return this.refreshTokenRequest
+        if(this.refreshTokenRequest){    
+         return this.refreshTokenRequest
         }
         this.refreshTokenRequest = http.post<RefreshTokenResType>('/api/auth/refresh-token',null,{baseUrl:''})
         const result = await this.refreshTokenRequest
+        
         this.refreshTokenRequest= null
         return result
     } 

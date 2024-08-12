@@ -34,8 +34,7 @@ export default async function Home() {
       <section className='space-y-10 py-16'>
         <h2 className='text-center text-2xl font-bold'>Đa dạng các món ăn</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-10'>
-          {dishList
-            .map((dish) => (
+          {dishList.filter(product=> product.status !== "Hidden").map((dish) => (
               <div className='flex gap-4 w' key={dish.id}>
                 <div className='flex-shrink-0'>
                   <Image

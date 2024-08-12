@@ -7,6 +7,9 @@ const nextConfig = {
             hostname: 'localhost',
             port: '4000',
             pathname:'/**'
+          },{
+            hostname: 'via.placeholder.com',
+            pathname:'/**'
           }
         ]
       }

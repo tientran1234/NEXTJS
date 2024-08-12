@@ -8,7 +8,7 @@ function Logout(){
   const {mutateAsync} = useLogoutMutation()
     const router = useRouter()
     const searchParams = useSearchParams()
-    const {setIsAuth}= useAppContext()
+    const {setRole}= useAppContext()
     const refreshTokenFromUrl = searchParams.get('refreshToken')
     const accessTokenFromUrl = searchParams.get('accessToken')
     const ref = useRef<any>(null)
@@ -20,14 +20,14 @@ function Logout(){
         setTimeout(()=>{
           ref.current = null
         },1000)
-        setIsAuth(false)
+        setRole(undefined)
         router.push('/login')
       })
      }else{
       router.push('/')
      }
    
-    },[mutateAsync,router,refreshTokenFromUrl,accessTokenFromUrl,setIsAuth])
+    },[mutateAsync,router,refreshTokenFromUrl,accessTokenFromUrl,setRole])
   return (
     <div>logout page...</div>
   )

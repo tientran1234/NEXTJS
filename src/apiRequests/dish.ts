@@ -3,7 +3,7 @@ import { AccountListResType, AccountResType, ChangePasswordBodyType, CreateEmplo
 import { CreateDishBodyType, DishListResType, DishResType, UpdateDishBodyType } from "@/schemaValidations/dish.schema";
 const prefix= '/dishes'
 export const dishApiRequest ={
-    list:()=>http.get<DishListResType>(`${prefix}`),
+    list:()=>http.get<DishListResType>(`${prefix}`,{next:{tags:['dishes']}}),
     addDish:(body:CreateDishBodyType)=>http.post<DishResType>(prefix,body),
     updateDish:(id:number,body:UpdateDishBodyType) => http.put<DishResType>(`${prefix}/${id}`,body),
     getDish:(id:number)=>http.get<DishResType>(`${prefix}/${id}`),

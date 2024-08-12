@@ -45,7 +45,6 @@ import AddTable from '@/app/manage/tables/add-table'
 import { useDeleteTableMutation, useTableListQuery } from '@/queries/useTable'
 import QRCodeTable from '@/components/qrcode-table'
 import { toast } from '@/components/ui/use-toast'
-import { deleteTable } from './../../../../../NextJs-Super-BackEnd/src/controllers/table.controller';
 
 type TableItem = TableListResType['data'][0]
 

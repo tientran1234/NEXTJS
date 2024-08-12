@@ -5,8 +5,10 @@ import { EntityError } from "./http"
 import { UseFormSetError } from "react-hook-form"
 import  jwt  from 'jsonwebtoken';
 import authApiRequest from "@/apiRequests/auth"
-import { OrderStatus, TableStatus } from "@/constants/type"
+import { OrderStatus, Role, TableStatus } from "@/constants/type"
 import envConfig from "@/config"
+import { TokenPayload } from "@/types/jwt.types"
+import guestApiRequest from "@/apiRequests/guest"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -62,21 +64,26 @@ export const checkAndRefreshToken = async(param?:{onError?:()=>void,onSuccess?:(
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
   if(!accessToken ||!refreshToken) return
-  const decodedAccessToken = jwt.decode(accessToken) as { exp: number,iat:number }
-  const decodedRefreshToken = jwt.decode(refreshToken) as { exp: number,iat:number }
+  const decodedAccessToken = decodeToken(accessToken) 
+  const decodedRefreshToken = decodeToken(refreshToken) 
   const now = (new Date().getTime()/1000)-1
   if(decodedRefreshToken.exp<=now) {
     removeTokensFromLocalStorage()
+    
     return  param?.onError && param.onError()
     
   }
+
   if(decodedAccessToken.exp - now < (decodedAccessToken.exp-decodedAccessToken.iat)/3)
   {
       try {
-          const res = await authApiRequest.refreshToken()
+        const role = decodedRefreshToken.role
+          const res =Role.Guest ? (await guestApiRequest.refreshToken()): (await authApiRequest.refreshToken())
+          
           setAccessTokenToLocalStorage(res.payload.data.accessToken)
           setRefreshTokenToLocalStorage(res.payload.data.refreshToken
           )
+          
           param?.onSuccess && param.onSuccess()
       } catch (
           error
@@ -132,4 +139,33 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
 
 export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
   return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
+}
+export const decodeToken = (token:string)=>{
+  return jwt.decode(token) as TokenPayload
+}
+export const simpleMatchText = (fullText: string, matchText: string) => {
+  return removeAccents(fullText.toLowerCase()).includes(removeAccents(matchText.trim().toLowerCase()))
+}
+export function removeAccents(str: string) {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+}
+
+export const formatDateTimeToLocaleString = (date: string | Date) => {
+  return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss dd/MM/yyyy')
+}
+
+export const formatDateTimeToTimeString = (date: string | Date) => {
+  return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss')
+}
+
+export const OrderStatusIcon = {
+  [OrderStatus.Pending]: Loader,
+  [OrderStatus.Processing]: CookingPot,
+  [OrderStatus.Rejected]: BookX,
+  [OrderStatus.Delivered]: Truck,
+  [OrderStatus.Paid]: HandCoins
 }
