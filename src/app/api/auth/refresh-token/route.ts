@@ -9,6 +9,7 @@ export async function POST(request: Request) {
     const cookieStore = cookies()
     const refreshToken = cookieStore.get('refreshToken')?.value
     
+    
     if(!refreshToken){
         return Response.json({
             message:'Can not find refreshToken'
@@ -18,6 +19,8 @@ export async function POST(request: Request) {
     }
     try {
         const { payload } = await authApiRequest.sRefreshToken({refreshToken})
+   
+        
         const decodedAccessToken = jwt.decode(payload.data.accessToken) as { exp: number }
         const decodedRefreshToken = jwt.decode(payload.data.refreshToken) as { exp: number }
         cookieStore.set('accessToken', payload.data.accessToken, {
@@ -36,7 +39,6 @@ export async function POST(request: Request) {
         })
         return Response.json(payload)
     } catch (error:any) {
-        console.log(error);
         
         if (error instanceof HttpError) {
             return Response.json(error.payload, {

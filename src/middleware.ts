@@ -19,27 +19,31 @@ export function middleware(request: NextRequest) {
         url.searchParams.set('clearTokens','true')
         return NextResponse.redirect(url)
     }
-    if(refreshToken){
-        if (unAuthPaths.some(path => pathname.startsWith(path)) && refreshToken) {
+    if(refreshToken){  
+        if (unAuthPaths.some(path => pathname.startsWith(path))) {  
             return NextResponse.redirect(new URL('/', request.url))
         }
-        if (privatePaths.some(path => pathname.startsWith(path)) && !accessToken) {
+        if (privatePaths.some(path => pathname.startsWith(path)) && !accessToken) { 
+            console.log("cc ne");
+            
             const url = new URL('/refresh-token',request.url)
             url.searchParams.set('refreshToken',refreshToken)
             url.searchParams.set('redirect',pathname)
             return NextResponse.redirect(url)
         }
+        
         const role = decodeToken(refreshToken).role
+        console.log(role);
+        
         const isGuestGoToManagePaths = (role===Role.Guest && managePaths.some((path)=>pathname.startsWith(path)) )
         const isNotGuestGoToManagePaths =(role !==Role.Guest&& guestPaths.some((path)=>pathname.startsWith(path)))
+      
 
+        
         if( isGuestGoToManagePaths||isNotGuestGoToManagePaths ){
             return NextResponse.redirect(new URL('/',request.url))
         }
     }
-   
-   
-   
     return NextResponse.next()
 }
 

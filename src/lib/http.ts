@@ -84,6 +84,7 @@ const request = async <Response>(
         method
     })
     const payload: Response = await res.json()
+    
     const data = {
         status: res.status,
         payload

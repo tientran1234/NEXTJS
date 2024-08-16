@@ -9,7 +9,8 @@ import { OrderStatus, Role, TableStatus } from "@/constants/type"
 import envConfig from "@/config"
 import { TokenPayload } from "@/types/jwt.types"
 import guestApiRequest from "@/apiRequests/guest"
-
+import {format} from "date-fns"
+import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -68,6 +69,7 @@ export const checkAndRefreshToken = async(param?:{onError?:()=>void,onSuccess?:(
   const decodedRefreshToken = decodeToken(refreshToken) 
   const now = (new Date().getTime()/1000)-1
   if(decodedRefreshToken.exp<=now) {
+    
     removeTokensFromLocalStorage()
     
     return  param?.onError && param.onError()
@@ -78,7 +80,7 @@ export const checkAndRefreshToken = async(param?:{onError?:()=>void,onSuccess?:(
   {
       try {
         const role = decodedRefreshToken.role
-          const res =Role.Guest ? (await guestApiRequest.refreshToken()): (await authApiRequest.refreshToken())
+          const res =Role.Guest===role ? (await guestApiRequest.refreshToken()): (await authApiRequest.refreshToken())
           
           setAccessTokenToLocalStorage(res.payload.data.accessToken)
           setRefreshTokenToLocalStorage(res.payload.data.refreshToken
@@ -88,6 +90,8 @@ export const checkAndRefreshToken = async(param?:{onError?:()=>void,onSuccess?:(
       } catch (
           error
       ) {
+        console.log(error);
+        
         param?.onError && param.onError()
 
       }

@@ -40,7 +40,7 @@ export default function LoginForm() {
         description:result.payload.message
       })
       setRole(result.payload.data.account.role)
-      setTimeout(()=>router.push('/manage/dashboard'),2000)
+      router.push('/manage/dashboard')
     
     }catch(error:any){
         handleErrorApi({
