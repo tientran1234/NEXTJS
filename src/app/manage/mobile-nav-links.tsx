@@ -3,12 +3,14 @@ import menuItems from '@/app/manage/menuItems'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
+import { useAppContext } from '@/components/app-provider'
 import { Package2, PanelLeft } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 export default function MobileNavLinks() {
   const pathname = usePathname()
+  const {role}= useAppContext()
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -28,6 +30,7 @@ export default function MobileNavLinks() {
           </Link>
           {menuItems.map((Item, index) => {
             const isActive = pathname === Item.href
+            if(!Item.roles.includes(role as any)) return null
             return (
               <Link
                 key={index}

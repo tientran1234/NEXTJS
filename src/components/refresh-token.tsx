@@ -1,29 +1,55 @@
+import { socket } from '@/lib/socket'
 import { checkAndRefreshToken, getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import  { useEffect } from 'react'
+import { useAppContext } from './app-provider'
 const UNAUTHENTICATED_PATH=['/login','/logout','/refresh-token']
 const RefreshToken = () => {
     const pathname =  usePathname()
     const router = useRouter()
-   
+   const {disconnectSocket,socket}= useAppContext()
     useEffect(()=>{
         if(UNAUTHENTICATED_PATH.includes(pathname)) return
         let interval:any = null
        
-                    checkAndRefreshToken({
+                   const onRefreshToken=(force?:boolean)=> checkAndRefreshToken({
                         onError:()=>{
                             clearInterval(interval)
+                           disconnectSocket()
                             router.push('/login')
-                        }
+                        },
+                        force
                     })
-                    interval = setInterval(()=>checkAndRefreshToken({
-                        onError:()=>{
-                            clearInterval(interval)
-                            router.push('/login')
-                        }
-                    }),1000) 
-                    return ()=> clearInterval(interval)
-    },[pathname,router])
+
+                    onRefreshToken()
+                    interval = setInterval(onRefreshToken,1000) 
+                    if (socket?.connected) {
+                        onConnect();
+                      }
+                    
+                      function onConnect() {
+                        console.log(socket?.id);
+                        
+                      }
+                      function onDisconnect() {
+                        console.log("disconect");
+                        
+                      }
+                      function onRefreshTokenSocket() {
+                        onRefreshToken(true)
+                        
+                      }
+                      socket?.on("connect", onConnect);
+                      socket?.on("disconnect", onDisconnect);
+                      socket?.on("refresh-token", onRefreshTokenSocket);
+                
+                    return ()=>{
+                        clearInterval(interval)
+                        socket?.off("connect", onConnect)
+                        socket?.off("disconnect", onDisconnect)
+                        socket?.off("refresh-token", onRefreshTokenSocket);
+                    } 
+    },[pathname,router,socket,disconnectSocket])
   return null
    
 }

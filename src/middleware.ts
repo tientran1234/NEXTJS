@@ -6,6 +6,7 @@ import { Role } from './constants/type'
 const managePaths = ['/manage']
 const unAuthPaths = ['/login']
 const guestPaths = ['/guest']
+const onlyOwnerPath= ["/manage/accounts"]
 const privatePaths = [...managePaths,...guestPaths]
 
 // This function can be marked `async` if using `await` inside
@@ -24,7 +25,6 @@ export function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/', request.url))
         }
         if (privatePaths.some(path => pathname.startsWith(path)) && !accessToken) { 
-            console.log("cc ne");
             
             const url = new URL('/refresh-token',request.url)
             url.searchParams.set('refreshToken',refreshToken)
@@ -37,13 +37,14 @@ export function middleware(request: NextRequest) {
         
         const isGuestGoToManagePaths = (role===Role.Guest && managePaths.some((path)=>pathname.startsWith(path)) )
         const isNotGuestGoToManagePaths =(role !==Role.Guest&& guestPaths.some((path)=>pathname.startsWith(path)))
-      
+        const isNotOwnerGoToOwnerPath = (role!==Role.Owner && onlyOwnerPath.some((path)=>pathname.startsWith(path)))
 
         
-        if( isGuestGoToManagePaths||isNotGuestGoToManagePaths ){
+        if( isGuestGoToManagePaths||isNotGuestGoToManagePaths || isNotOwnerGoToOwnerPath){
             return NextResponse.redirect(new URL('/',request.url))
         }
     }
+    
     return NextResponse.next()
 }
 

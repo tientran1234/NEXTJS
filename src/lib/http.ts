@@ -101,6 +101,7 @@ const request = async <Response>(
         } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
             if (isClient) {
                 if (!clientLogoutRequest) {
+                    
                     clientLogoutRequest = fetch('/api/auth/logout', {
                         method: 'POST',
                         body: null, // Logout mình sẽ cho phép luôn luôn thành công

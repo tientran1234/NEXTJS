@@ -6,13 +6,14 @@ import Image from 'next/image'
 import {  formatCurrency,  getVietnameseOrderStatus } from './../../../lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { socket } from './../../../lib/socket';
 import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema';
 import { toast } from '@/components/ui/use-toast';
 import { OrderStatus } from '@/constants/type';
+import { useAppContext } from '@/components/app-provider';
 
 const OrdersCart = () => {
   const {data,refetch} = useGuestOrderListQuery()
+  const {socket} = useAppContext()
   const orders =data?.payload.data ??[]
   const {waitingForPaying,paid} =useMemo(()=>{
     return orders.reduce((result,order)=>{
@@ -47,12 +48,12 @@ const OrdersCart = () => {
     })
 },[orders])
 useEffect(() => {
-  if (socket.connected) {
+  if (socket?.connected) {
     onConnect();
   }
 
   function onConnect() {
-    console.log(socket.id);
+    console.log(socket?.id);
     
   }
   function onUpdateOrder(data:UpdateOrderResType['data']){
@@ -73,19 +74,19 @@ useEffect(() => {
     console.log("disconect");
     
   }
-socket.on('update-order',onUpdateOrder
+socket?.on('update-order',onUpdateOrder
 )
-  socket.on("connect", onConnect);
-  socket.on("disconnect", onDisconnect);
-  socket.on("payment", onPayment);
+  socket?.on("connect", onConnect);
+  socket?.on("disconnect", onDisconnect);
+  socket?.on("payment", onPayment);
   
 
   return () => {
-    socket.off("connect", onConnect);
-    socket.off("disconnect", onDisconnect);
-    socket.off('update-order',onUpdateOrder
+    socket?.off("connect", onConnect);
+    socket?.off("disconnect", onDisconnect);
+    socket?.off('update-order',onUpdateOrder
     )
-    socket.off("payment", onPayment);
+    socket?.off("payment", onPayment);
   
   };
 }, [data]);

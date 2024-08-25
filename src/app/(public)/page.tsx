@@ -23,6 +23,7 @@ export default async function Home() {
           width={400}
           height={200}
           quality={100}
+          priority
           alt='Banner'
           className='absolute top-0 left-0 w-full h-full object-cover'
         />
@@ -39,11 +40,11 @@ export default async function Home() {
                 <div className='flex-shrink-0'>
                   <Image
                   alt={dish.name}
-                   width={150}
-                   height={200}
+                   width={120}
+                   height={150}
                    quality={100}
                     src={dish.image}
-                    className='object-cover w-[150px] h-[150px] rounded-md'
+                    className='object-cover w-auto h-auto rounded-md'
                   />
                 </div>
                 <div className='space-y-1'>

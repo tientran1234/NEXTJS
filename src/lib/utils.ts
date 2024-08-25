@@ -11,6 +11,7 @@ import { TokenPayload } from "@/types/jwt.types"
 import guestApiRequest from "@/apiRequests/guest"
 import {format} from "date-fns"
 import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
+import { io } from "socket.io-client";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -61,7 +62,7 @@ export const removeTokensFromLocalStorage = () =>{
   isBrower && localStorage.removeItem('accessToken')
   isBrower && localStorage.removeItem('refreshToken')
 }
-export const checkAndRefreshToken = async(param?:{onError?:()=>void,onSuccess?:()=>void})=>{
+export const checkAndRefreshToken = async(params?:{onError?:()=>void,onSuccess?:()=>void,force?:boolean})=>{
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
   if(!accessToken ||!refreshToken) return
@@ -72,11 +73,11 @@ export const checkAndRefreshToken = async(param?:{onError?:()=>void,onSuccess?:(
     
     removeTokensFromLocalStorage()
     
-    return  param?.onError && param.onError()
+    return  params?.onError && params.onError()
     
   }
 
-  if(decodedAccessToken.exp - now < (decodedAccessToken.exp-decodedAccessToken.iat)/3)
+  if(params?.force || (decodedAccessToken.exp - now < (decodedAccessToken.exp-decodedAccessToken.iat)/3))
   {
       try {
         const role = decodedRefreshToken.role
@@ -86,13 +87,13 @@ export const checkAndRefreshToken = async(param?:{onError?:()=>void,onSuccess?:(
           setRefreshTokenToLocalStorage(res.payload.data.refreshToken
           )
           
-          param?.onSuccess && param.onSuccess()
+          params?.onSuccess && params.onSuccess()
       } catch (
           error
       ) {
         console.log(error);
         
-        param?.onError && param.onError()
+        params?.onError && params.onError()
 
       }
   }
@@ -165,11 +166,17 @@ export const formatDateTimeToLocaleString = (date: string | Date) => {
 export const formatDateTimeToTimeString = (date: string | Date) => {
   return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss')
 }
-
 export const OrderStatusIcon = {
   [OrderStatus.Pending]: Loader,
   [OrderStatus.Processing]: CookingPot,
   [OrderStatus.Rejected]: BookX,
   [OrderStatus.Delivered]: Truck,
   [OrderStatus.Paid]: HandCoins
+}
+export const genarateSocketInstance = (accessToken:string)=>{
+  return io(envConfig.NEXT_PUBLIC_API_ENDPOINT,{
+    auth:{
+        Authorization:`Bearer ${accessToken}`
+    }
+});
 }

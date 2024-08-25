@@ -9,15 +9,18 @@ import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '@/queries/useAuth'
 import { toast } from '@/components/ui/use-toast'
-import { handleErrorApi, removeTokensFromLocalStorage } from '@/lib/utils'
+import { genarateSocketInstance, handleErrorApi, removeTokensFromLocalStorage } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useAppContext } from '@/components/app-provider'
+import envConfig from '@/config'
+import { io } from 'socket.io-client';
+import Link from 'next/link'
 export default function LoginForm() {
   const loginMutation = useLoginMutation()
   const searchParams = useSearchParams()
   const clearTokens=searchParams.get('clearTokens')
-  const {setRole}= useAppContext()
+  const {setRole,setSocket}= useAppContext()
   const router = useRouter()
   useEffect(()=>{
     if(clearTokens){
@@ -31,6 +34,23 @@ export default function LoginForm() {
       password: ''
     }
   })
+  const getOauthGoogleUrl = () => {
+    const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
+    const options = {
+      redirect_uri:envConfig.NEXT_PUBLIC_GOOGLE_AUTHORIZED_REDIRECT_URI,
+      client_id:  envConfig.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+      access_type: 'offline',
+      response_type: 'code',
+      prompt: 'consent',
+      scope: [
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email'
+      ].join(' ')
+    }
+    const qs = new URLSearchParams(options)
+    return `${rootUrl}?${qs.toString()}`
+  }
+  const googleOauthUrl = getOauthGoogleUrl()
   const onSubmit =  async(data:LoginBodyType)=>{
     if(loginMutation.isPending) return 
     try{
@@ -41,7 +61,7 @@ export default function LoginForm() {
       })
       setRole(result.payload.data.account.role)
       router.push('/manage/dashboard')
-    
+      setSocket(genarateSocketInstance(result.payload.data.accessToken))
     }catch(error:any){
         handleErrorApi({
           error,
@@ -92,9 +112,12 @@ export default function LoginForm() {
               <Button type='submit' className='w-full'>
                 Đăng nhập
               </Button>
+              <Link href={googleOauthUrl}>
               <Button variant='outline' className='w-full' type='button'>
                 Đăng nhập bằng Google
               </Button>
+              </Link>
+              
             </div>
           </form>
         </Form>
