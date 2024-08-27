@@ -84,7 +84,7 @@ const request = async <Response>(
         method
     })
     const payload: Response = await res.json()
-    
+
     const data = {
         status: res.status,
         payload
@@ -101,7 +101,7 @@ const request = async <Response>(
         } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
             if (isClient) {
                 if (!clientLogoutRequest) {
-                    
+
                     clientLogoutRequest = fetch('/api/auth/logout', {
                         method: 'POST',
                         body: null, // Logout mình sẽ cho phép luôn luôn thành công
@@ -133,15 +133,19 @@ const request = async <Response>(
     // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
     if (isClient) {
         const normalizeUrl = normalizePath(url)
-        if ([ 'api/auth/login', 'api/guest/auth/login'].includes(normalizeUrl)) {
+        if (['api/auth/login', 'api/guest/auth/login'].includes(normalizeUrl)) {
             const { accessToken, refreshToken } = (payload as LoginResType).data
             setAccessTokenToLocalStorage(accessToken)
             setRefreshTokenToLocalStorage(refreshToken)
-        } else if ([ 'api/auth/logout', 'api/guest/auth/logout'].includes(normalizeUrl)) {
+        } else if ('api/auth/token' === normalizeUrl) {
+            const { accessToken, refreshToken } = (payload as { accessToken: string, refreshToken: string })
+            setAccessTokenToLocalStorage(accessToken)
+            setRefreshTokenToLocalStorage(refreshToken)
+        } else if (['api/auth/logout', 'api/guest/auth/logout'].includes(normalizeUrl)) {
             removeTokensFromLocalStorage()
         }
     }
-    
+
     return data
 }
 

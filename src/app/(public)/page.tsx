@@ -2,6 +2,7 @@ import { dishApiRequest } from '@/apiRequests/dish'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
 import { formatCurrency } from './../../lib/utils';
+import Link from 'next/link';
 
 export default async function Home() {
   let dishList:DishListResType['data']=[]
@@ -36,7 +37,8 @@ export default async function Home() {
         <h2 className='text-center text-2xl font-bold'>Đa dạng các món ăn</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-10'>
           {dishList.filter(product=> product.status !== "Hidden").map((dish) => (
-              <div className='flex gap-4 w' key={dish.id}>
+              <Link className='flex gap-4 w' href = {`/dishes/${dish.id}`}key={dish.id}>
+               
                 <div className='flex-shrink-0'>
                   <Image
                   alt={dish.name}
@@ -52,7 +54,7 @@ export default async function Home() {
                   <p className=''>{dish.description}</p>
                   <p className='font-semibold'>{formatCurrency(dish.price)}</p>
                 </div>
-              </div>
+              </Link>
             ))}
         </div>
       </section>

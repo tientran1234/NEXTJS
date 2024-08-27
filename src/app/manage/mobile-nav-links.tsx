@@ -3,14 +3,14 @@ import menuItems from '@/app/manage/menuItems'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/components/app-provider'
 import { Package2, PanelLeft } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 export default function MobileNavLinks() {
   const pathname = usePathname()
-  const {role}= useAppContext()
+  const {role}= useAppStore()
   return (
     <Sheet>
       <SheetTrigger asChild>

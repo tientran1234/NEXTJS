@@ -9,12 +9,12 @@ import { Button } from '@/components/ui/button';
 import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema';
 import { toast } from '@/components/ui/use-toast';
 import { OrderStatus } from '@/constants/type';
-import { useAppContext } from '@/components/app-provider';
+import { useAppStore } from '@/components/app-provider';
 
 const OrdersCart = () => {
   const {data,refetch} = useGuestOrderListQuery()
-  const {socket} = useAppContext()
-  const orders =data?.payload.data ??[]
+  const socket= useAppStore(state =>state.socket)
+  const orders =useMemo(()=>data?.payload.data ??[],[data])
   const {waitingForPaying,paid} =useMemo(()=>{
     return orders.reduce((result,order)=>{
       if(order.status ===OrderStatus.Delivered || order.status === OrderStatus.Processing || order.status ===OrderStatus.Pending){

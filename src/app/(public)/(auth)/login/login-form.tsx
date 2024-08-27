@@ -12,7 +12,7 @@ import { toast } from '@/components/ui/use-toast'
 import { genarateSocketInstance, handleErrorApi, removeTokensFromLocalStorage } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/components/app-provider'
 import envConfig from '@/config'
 import { io } from 'socket.io-client';
 import Link from 'next/link'
@@ -20,7 +20,8 @@ export default function LoginForm() {
   const loginMutation = useLoginMutation()
   const searchParams = useSearchParams()
   const clearTokens=searchParams.get('clearTokens')
-  const {setRole,setSocket}= useAppContext()
+ const setSocket = useAppStore(state=>state.setSocket)
+ const setRole=useAppStore(state=>state.setRole)
   const router = useRouter()
   useEffect(()=>{
     if(clearTokens){
@@ -60,8 +61,9 @@ export default function LoginForm() {
         description:result.payload.message
       })
       setRole(result.payload.data.account.role)
-      router.push('/manage/dashboard')
       setSocket(genarateSocketInstance(result.payload.data.accessToken))
+      router.push('/manage/dashboard')
+      
     }catch(error:any){
         handleErrorApi({
           error,

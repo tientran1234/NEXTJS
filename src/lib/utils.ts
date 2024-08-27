@@ -3,15 +3,16 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { EntityError } from "./http"
 import { UseFormSetError } from "react-hook-form"
-import  jwt  from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import authApiRequest from "@/apiRequests/auth"
 import { OrderStatus, Role, TableStatus } from "@/constants/type"
 import envConfig from "@/config"
 import { TokenPayload } from "@/types/jwt.types"
 import guestApiRequest from "@/apiRequests/guest"
-import {format} from "date-fns"
+import { format } from "date-fns"
 import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
-import { io } from "socket.io-client";
+import io from 'socket.io-client';
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -55,67 +56,66 @@ const isBrower = typeof window !== 'undefined'
 export const getAccessTokenFromLocalStorage = () => { return isBrower ? localStorage.getItem("accessToken") : null }
 
 export const getRefreshTokenFromLocalStorage = () => { return isBrower ? localStorage.getItem('refreshToken') : null }
-export const setAccessTokenToLocalStorage = (value:string) => { return isBrower && localStorage.setItem("accessToken",value)  }
+export const setAccessTokenToLocalStorage = (value: string) => { return isBrower && localStorage.setItem("accessToken", value) }
 
-export const setRefreshTokenToLocalStorage = (value:string) => { return isBrower && localStorage.setItem('refreshToken',value)  }
-export const removeTokensFromLocalStorage = () =>{
+export const setRefreshTokenToLocalStorage = (value: string) => { return isBrower && localStorage.setItem('refreshToken', value) }
+export const removeTokensFromLocalStorage = () => {
   isBrower && localStorage.removeItem('accessToken')
   isBrower && localStorage.removeItem('refreshToken')
 }
-export const checkAndRefreshToken = async(params?:{onError?:()=>void,onSuccess?:()=>void,force?:boolean})=>{
+export const checkAndRefreshToken = async (params?: { onError?: () => void, onSuccess?: () => void, force?: boolean }) => {
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
-  if(!accessToken ||!refreshToken) return
-  const decodedAccessToken = decodeToken(accessToken) 
-  const decodedRefreshToken = decodeToken(refreshToken) 
-  const now = (new Date().getTime()/1000)-1
-  if(decodedRefreshToken.exp<=now) {
-    
+  if (!accessToken || !refreshToken) return
+  const decodedAccessToken = decodeToken(accessToken)
+  const decodedRefreshToken = decodeToken(refreshToken)
+  const now = (new Date().getTime() / 1000) - 1
+  if (decodedRefreshToken.exp <= now) {
+
     removeTokensFromLocalStorage()
-    
-    return  params?.onError && params.onError()
-    
+
+    return params?.onError && params.onError()
+
   }
 
-  if(params?.force || (decodedAccessToken.exp - now < (decodedAccessToken.exp-decodedAccessToken.iat)/3))
-  {
-      try {
-        const role = decodedRefreshToken.role
-          const res =Role.Guest===role ? (await guestApiRequest.refreshToken()): (await authApiRequest.refreshToken())
-          
-          setAccessTokenToLocalStorage(res.payload.data.accessToken)
-          setRefreshTokenToLocalStorage(res.payload.data.refreshToken
-          )
-          
-          params?.onSuccess && params.onSuccess()
-      } catch (
-          error
-      ) {
-        console.log(error);
-        
-        params?.onError && params.onError()
+  if (params?.force || (decodedAccessToken.exp - now < (decodedAccessToken.exp - decodedAccessToken.iat) / 3)) {
+    try {
+      const role = decodedRefreshToken.role
+      const res = Role.Guest === role ? (await guestApiRequest.refreshToken()) : (await authApiRequest.refreshToken())
 
-      }
+      setAccessTokenToLocalStorage(res.payload.data.accessToken)
+      setRefreshTokenToLocalStorage(res.payload.data.refreshToken
+      )
+
+      params?.onSuccess && params.onSuccess()
+    } catch (
+    error
+    ) {
+      console.log(error);
+
+      params?.onError && params.onError()
+
+    }
   }
-          }
-          export const formatCurrency = (number: number) => {
-            return new Intl.NumberFormat('vi-VN', {
-              style: 'currency',
-              currency: 'VND'
-            }).format(number)
-          }
-          
-          export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
-            switch (status) {
-              case DishStatus.Available:
-                return 'Có sẵn'
-              case DishStatus.Unavailable:
-                return 'Không có sẵn'
-              default:
-                return 'Ẩn'
-            }
-          }
-          
+}
+export const formatCurrency = (number: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(number)
+}
+
+export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
+  switch (status) {
+    case DishStatus.Available:
+      return 'Có sẵn'
+    case DishStatus.Unavailable:
+      return 'Không có sẵn'
+    default:
+      return 'Ẩn'
+  }
+}
+
 export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
   switch (status) {
     case OrderStatus.Delivered:
@@ -145,7 +145,7 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
 export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
   return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
 }
-export const decodeToken = (token:string)=>{
+export const decodeToken = (token: string) => {
   return jwt.decode(token) as TokenPayload
 }
 export const simpleMatchText = (fullText: string, matchText: string) => {
@@ -173,10 +173,22 @@ export const OrderStatusIcon = {
   [OrderStatus.Delivered]: Truck,
   [OrderStatus.Paid]: HandCoins
 }
-export const genarateSocketInstance = (accessToken:string)=>{
-  return io(envConfig.NEXT_PUBLIC_API_ENDPOINT,{
-    auth:{
-        Authorization:`Bearer ${accessToken}`
+export const genarateSocketInstance = (accessToken: string) => {
+  return io(envConfig.NEXT_PUBLIC_API_ENDPOINT, {
+    auth: {
+      Authorization: `Bearer ${accessToken}`
     }
-});
+  });
+}
+export const wrapServerApi = async <T>(fn: () => Promise<T>) => {
+  let result = null
+  try {
+    result = await fn()
+  } catch (error: any) {
+    if (error.digest?.includes('NEXT_REDIRECT')) {
+      throw error
+    }
+  }
+  return result
+
 }
