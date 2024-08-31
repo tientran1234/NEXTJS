@@ -5,8 +5,8 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/components/app-provider'
 import { Package2, PanelLeft } from 'lucide-react'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Link } from '@/navigation'
 
 export default function MobileNavLinks() {
   const pathname = usePathname()
