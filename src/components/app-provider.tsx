@@ -6,12 +6,13 @@ import{
   import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import RefreshToken from './refresh-token'
-import { decodeToken, genarateSocketInstance, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
+import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
 import { RoleType } from '@/types/jwt.types'
 import { Socket } from 'socket.io-client'
 import ListenLogoutSocket from './listen-logout-socket'
 import {create} from "zustand"
 import { socket } from '@/lib/socket'
+import { genarateSocketInstance } from '@/lib/client-utils'
 const queryClient = new QueryClient({
     defaultOptions:{
         queries:{

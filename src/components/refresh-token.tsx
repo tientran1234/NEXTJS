@@ -1,8 +1,8 @@
 import { socket } from '@/lib/socket'
 import { checkAndRefreshToken, getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from '@/lib/utils'
-import { usePathname, useRouter } from 'next/navigation'
 import  { useEffect } from 'react'
 import { useAppStore } from './app-provider'
+import { usePathname, useRouter } from '@/navigation'
 const UNAUTHENTICATED_PATH=['/login','/logout','/refresh-token']
 const RefreshToken = () => {
     const pathname =  usePathname()

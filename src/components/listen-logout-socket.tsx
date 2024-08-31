@@ -1,9 +1,10 @@
-import { usePathname ,useRouter} from "next/navigation"
+
 import { useEffect } from "react"
 import type { Socket } from "socket.io-client"
 import { useLogoutMutation } from '@/queries/useAuth';
 import { handleErrorApi } from "@/lib/utils";
 import { useAppStore } from "./app-provider";
+import { usePathname, useRouter } from "@/navigation";
 const UNAUTHENTICATED_PATH = ['/login','/logout','/refresh-token']
 export default function ListenLogoutSocket(){
     const pathname = usePathname()
