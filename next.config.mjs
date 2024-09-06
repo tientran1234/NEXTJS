@@ -6,7 +6,7 @@ const nextConfig = {
     images: {
         remotePatterns: [
           {
-            hostname: 'api-bigboy.duthanhduoc.com',
+            hostname: 'cyperstack.com',
             pathname:'/**'
           },{
             hostname: 'via.placeholder.com',
