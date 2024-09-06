@@ -6,7 +6,7 @@ const nextConfig = {
     images: {
         remotePatterns: [
           {
-            hostname: 'cyperstack.com',
+            hostname: 'nextjs-3jxnpu1ni-tranngoctien29112003gmailcoms-projects.vercel.app',
             pathname:'/**'
           },{
             hostname: 'via.placeholder.com',
