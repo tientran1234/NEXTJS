@@ -8,7 +8,12 @@ const nextConfig = {
           {
             hostname: 'nextjs-3jxnpu1ni-tranngoctien29112003gmailcoms-projects.vercel.app',
             pathname:'/**'
-          },{
+          },
+          {
+            hostname: 'localhost',
+            pathname:'/**'
+          }
+          ,{
             hostname: 'via.placeholder.com',
             pathname:'/**'
           }

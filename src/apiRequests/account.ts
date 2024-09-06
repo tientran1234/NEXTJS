@@ -10,7 +10,7 @@ export const accountApiRequest = {
     addEmployee: (body: CreateEmployeeAccountBodyType) => http.post<AccountResType>(prefix, body),
     updateEmployee: (id: number, body: UpdateEmployeeAccountBodyType) => http.put<AccountResType>(`${prefix}/detail/${id}`, body),
     getEmployee: (id: number) => http.get<AccountResType>(`${prefix}/detail/${id}`),
-    deleteEmployee: (id: number, body: { id: number }) => http.delete<AccountResType>(`${prefix}/detail/${id}`, body),
+    deleteEmployee: (id: number) => http.delete<AccountResType>(`${prefix}/detail/${id}`, {}),
     guestList: (queryParams: GetGuestListQueryParamsType) => http.get<GetListGuestsResType>(`${prefix}/guests?` + queryString.stringify({
         fromDate: queryParams.fromDate?.toISOString(),
         toDate: queryParams.toDate?.toISOString()
